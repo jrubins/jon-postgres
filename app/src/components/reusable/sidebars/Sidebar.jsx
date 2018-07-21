@@ -12,28 +12,21 @@ class Sidebar extends Component {
     }
   }
 
+  async componentDidMount() {
+    this.setState({
+      tableNames: await getTableNames(),
+    })
+  }
+
   render() {
     const { onSelectTable, selectedTable } = this.props
     const { tableNames } = this.state
 
     return (
       <div className="sidebar">
-        {tableNames.length === 0 && (
-          <a
-            onClick={async () => {
-              const tableNames = await getTableNames()
-              this.setState({
-                tableNames,
-              })
-            }}
-          >
-            Click Me
-          </a>
-        )}
-
         <ul>
           {tableNames.map(tableName => (
-            <li>
+            <li key={tableName}>
               <a
                 className={cn({
                   'sidebar-link-active': tableName === selectedTable,

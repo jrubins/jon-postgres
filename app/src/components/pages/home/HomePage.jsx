@@ -1,178 +1,125 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
+import { Textarea } from '@jrubins/react-components'
 import _ from 'lodash'
-import cn from 'classnames'
 const {
-  getTable,
-  getTableData,
   deleteRows,
+  getTableColumns,
+  getTableRows,
+  query,
 } = require('electron').remote.require('./db')
 
-import { formatDate } from '../../../utils/dates'
+import { KEYCODES } from '../../../utils/keyboards'
+
+import SqlTable from './SqlTable'
 
 class HomePage extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      tableColumns: [],
-      tableData: [],
-      selectedRows: [],
+      columns: [],
+      rows: [],
+      sql: null,
+      sqlMode: false,
     }
 
-    this.toggleRow = this.toggleRow.bind(this)
-  }
-
-  componentDidMount() {
-    document.addEventListener('keydown', async event => {
-      if (this.lastRowAdded && event.shiftKey) {
-        console.log('ADD!')
-        if (event.keyCode === 40) {
-          // down
-          if (!this.lastDirection || this.lastDirection === 'down') {
-            const nextRow = this.lastRowAdded - 1
-            this.lastRowAdded = nextRow
-            this.lastDirection = 'down'
-            this.toggleRow(nextRow)
-          } else {
-            const nextRow = this.lastRowAdded
-            this.lastRowAdded = nextRow
-            this.lastDirection = 'down'
-            this.toggleRow(nextRow)
-          }
-          /* this.setState(({ selectedRows }) => ({
-            selectedRows: [
-              ...selectedRows,
-              nextRow,
-            ]
-          }))*/
-        } else if (event.keyCode === 38) {
-          // up
-          if (!this.lastDirection || this.lastDirection === 'up') {
-            const nextRow = this.lastRowAdded + 1
-            this.lastRowAdded = nextRow
-            this.lastDirection = 'up'
-            this.toggleRow(nextRow)
-          } else {
-            const nextRow = this.lastRowAdded
-            this.lastRowAdded = nextRow
-            this.lastDirection = 'up'
-            this.toggleRow(nextRow)
-          }
-
-          /* this.setState(({ selectedRows }) => ({
-            selectedRows: [
-              ...selectedRows,
-              nextRow,
-            ]
-          }))*/
-        }
-      } else if (event.keyCode === 8 && !_.isEmpty(this.state.selectedRows)) {
-        console.log('Delete:', this.state.selectedRows)
-        await deleteRows(this.props.selectedTable, this.state.selectedRows)
-        this.setState({
-          tableData: _.reverse(await getTableData(this.props.selectedTable)),
-          selectedRows: [],
-        })
-      }
-    })
+    this.handleDeleteRows = this.handleDeleteRows.bind(this)
+    this.handleSqlKeydown = this.handleSqlKeydown.bind(this)
   }
 
   async componentDidUpdate(prevProps) {
-    if (this.props.selectedTable !== prevProps.selectedTable) {
-      const res1 = getTable(this.props.selectedTable)
-      const res2 = getTableData(this.props.selectedTable)
+    const { selectedTable } = this.props
 
-      const [columns, data] = await Promise.all([res1, res2])
-      console.log(columns, data)
+    if (selectedTable !== prevProps.selectedTable) {
+      const getTableColumnsPromise = getTableColumns(selectedTable)
+      const getTableRowsPromise = getTableRows(selectedTable)
+
+      const [columns, rows] = await Promise.all([
+        getTableColumnsPromise,
+        getTableRowsPromise,
+      ])
       this.setState({
-        tableColumns: columns,
-        tableData: _.reverse(data),
+        columns,
+        rows: _.reverse(rows),
       })
     }
   }
 
-  toggleRow(row) {
-    this.setState(({ selectedRows }) => {
-      if (_.includes(selectedRows, row)) {
-        return {
-          selectedRows: _.without(selectedRows, row),
-        }
-      }
+  /**
+   * Handles a deletion for the provided row indexes.
+   *
+   * @param {Array<Number>} rowIndexes
+   */
+  async handleDeleteRows(rowIndexes) {
+    const { selectedTable } = this.props
 
-      return {
-        selectedRows: [...selectedRows, row],
-      }
+    // TODO: This is inaccurate since the deleteRows fn expects row IDs, not row indexes.
+    await deleteRows(this.props.selectedTable, rowIndexes)
+
+    this.setState({
+      rows: _.reverse(await getTableRows(selectedTable)),
     })
+  }
+
+  /**
+   * Handles a keydown inside the SQL textarea.
+   *
+   * @param {SyntheticEvent} event
+   */
+  async handleSqlKeydown(event) {
+    if (event.keyCode === KEYCODES.ENTER && event.metaKey) {
+      const queryResults = await query(this.state.sql)
+
+      this.setState({
+        columns: _.keys(queryResults[0]),
+        rows: queryResults,
+        sqlSubmitted: true,
+      })
+    }
   }
 
   render() {
     const { selectedTable } = this.props
-    const { tableColumns, tableData, selectedRows } = this.state
-    console.log(tableColumns)
-    console.log(selectedRows)
+    const { columns, rows, sql, sqlMode, sqlSubmitted } = this.state
 
     return (
       <div className="page home-page">
-        <h1>{selectedTable}</h1>
-        <div className="table-data">
-          <table>
-            <thead>
-              <tr>{tableColumns.map(tc => <th key={tc}>{tc}</th>)}</tr>
-            </thead>
-            <tbody>
-              {tableData.map(data => (
-                <tr
-                  key={data.id}
-                  className={cn({
-                    'table-row-selected': _.includes(selectedRows, data.id),
-                  })}
-                  onClick={() => {
-                    this.initialRowClicked = data.id
-                    this.lastRowAdded = data.id
-                    if (
-                      selectedRows.length === 1 &&
-                      selectedRows[0] === data.id
-                    ) {
-                      this.setState({
-                        selectedRows: [],
-                      })
-                    } else {
-                      this.setState({
-                        selectedRows: [data.id],
-                      })
-                    }
-                  }}
-                >
-                  {tableColumns.map(tc => {
-                    const dataPoint = data[tc]
-                    if (dataPoint instanceof Date) {
-                      return (
-                        <td key={tc}>
-                          {formatDate(dataPoint, 'M/DD/YY h:mm:ss a')}
-                        </td>
-                      )
-                    }
-                    console.log(_.isBoolean(data[tc]))
-
-                    return (
-                      <td key={tc}>
-                        {_.isBoolean(data[tc]) ? `${data[tc]}` : data[tc]}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div>
+          {sqlMode && (
+            <a onClick={() => this.setState({ sqlMode: false })}>table view</a>
+          )}
+          {!sqlMode && (
+            <Fragment>
+              <h1 className="selected-table-name">{selectedTable}</h1>
+              <a onClick={() => this.setState({ sqlMode: true })}>SQL</a>
+            </Fragment>
+          )}
         </div>
+        {sqlMode && (
+          <div onKeyDown={this.handleSqlKeydown}>
+            <Textarea
+              handleChange={sql => this.setState({ sql })}
+              value={sql}
+            />
+
+            {sqlSubmitted && <SqlTable columns={columns} rows={rows} />}
+          </div>
+        )}
+        {!sqlMode && (
+          <SqlTable
+            columns={columns}
+            handleDelete={this.handleDeleteRows}
+            rows={rows}
+          />
+        )}
       </div>
     )
   }
 }
 
 HomePage.propTypes = {
-  selectedTable: PropTypes.string.isRequired,
+  selectedTable: PropTypes.string,
 }
 
 export default HomePage

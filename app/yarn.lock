@@ -78,6 +78,16 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
+"@jrubins/react-components@0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@jrubins/react-components/-/react-components-0.0.3.tgz#2cc872eeb7b03ce5aba8a6cda41ab5db00050460"
+  dependencies:
+    "@jrubins/utils" "0.0.1"
+
+"@jrubins/utils@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@jrubins/utils/-/utils-0.0.1.tgz#db485d934319112974e4cbb8632c5b22d44e0f4d"
+
 abab@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/abab/-/abab-1.0.4.tgz#5faad9c2c07f60dd76770f71cf025b62a63cfd4e"

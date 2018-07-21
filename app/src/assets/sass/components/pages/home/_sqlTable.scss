@@ -1,0 +1,32 @@
+.sql-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  tbody {
+    tr:nth-child(odd) {
+      background-color: $faded-black;
+    }
+
+    // Need extra specificity here due to the above psuedo selector.
+    tr.table-row-selected { // sass-lint:disable-line no-qualifying-elements
+      background-color: $faded-black-less;
+    }
+  }
+
+  th {
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  th,
+  td {
+    max-width: 200px;
+    padding: 5px 10px;
+
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}

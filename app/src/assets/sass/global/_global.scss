@@ -8,8 +8,8 @@ body {
   margin: 0;
   padding: 0;
 
-  background-color: $wild-sand;
-  color: $mine-shaft;
+  background-color: $light-white;
+  color: $light-black;
   font-family: $font-face;
   font-size: 14px;
   line-height: $base-line-height;
@@ -42,10 +42,7 @@ h3 {
 }
 
 h4 {
-  color: $shuttle-gray;
-
   font-size: 16px;
-  font-weight: bold;
 }
 
 h5 {
@@ -71,6 +68,8 @@ img {
 a,
 a:hover,
 a:focus {
+  color: $blue;
+
   text-decoration: none;
   cursor: pointer;
 }
@@ -103,18 +102,4 @@ input[type='password'] { // sass-lint:disable-line no-qualifying-elements
 
 input[type='password'] { // sass-lint:disable-line no-qualifying-elements
   font-family: sans-serif;
-}
-
-.hidden-xs {
-  @media (max-width: $screen-xs-max) {
-    display: none;
-  }
-}
-
-.visible-xs {
-  display: none;
-
-  @media (max-width: $screen-xs-max) {
-    display: inline;
-  }
 }

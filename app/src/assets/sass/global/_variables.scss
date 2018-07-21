@@ -1,38 +1,11 @@
-// Colors. Color names from: http://chir.ag/projects/name-that-color
-$alabaster: #fafafa;
-$alto: #ddd;
-$dusty-gray: #999;
-$jungle-green: #2bb673;
-$mine-shaft: #333;
-$shuttle-gray: #64676f;
-$silver: #c3c3c3;
-$storm-gray: #70747f;
-$tuna: #323439;
+// Colors.
+$blue: #1698ea;
+$faded-black: rgba(0, 0, 0, .05);
+$faded-black-less: rgba(0, 0, 0, .30);
+$light-black: #333;
+$light-white: #f6f6f6;
 $white: #fff;
-$wild-sand: #f6f6f6;
 
 // Fonts.
 $font-face: 'Lato', sans-serif;
-$font-weight-light: 300;
-$font-weight-normal: 400;
 $base-line-height: 1.42857;
-
-// Breakpoints and sizing.
-$max-width: 1130px;
-$screen-xs-max: 767px;
-$screen-md-min: 768px;
-$screen-md-max: 1024px;
-$screen-lg-min: 1230px;
-$screen-lg-max: 1366px;
-$form-section-spacing: 20px;
-$mobile-form-section-spacing: 30px;
-$mobile-padding: 15px;
-$mobile-footer-height: 80px;
-
-// Specific shared styles.
-$defined-box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 2px 3px rgba(0, 0, 0, .2);
-
-// Transitions.
-$bouncy-transition: cubic-bezier(.68, -.55, .27, 1.55);
-
-// z-index values
