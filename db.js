@@ -68,7 +68,11 @@ module.exports = {
    * @returns {Array<Object>}
    */
   query: async sql => {
-    const res = await client.query(sql)
-    return res.rows
+    try {
+      const res = await client.query(sql)
+      return res.rows
+    } catch (err) {
+      throw err
+    }
   },
 }

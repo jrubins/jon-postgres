@@ -1,7 +1,7 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Textarea } from '@jrubins/react-components'
 import _ from 'lodash'
+import cn from 'classnames'
 const {
   deleteRows,
   getTableColumns,
@@ -9,9 +9,12 @@ const {
   query,
 } = require('electron').remote.require('./db')
 
-import { KEYCODES } from '../../../utils/keyboards'
+import { error } from '../../../utils/logs'
 
+import SqlEditorIcon from '../../reusable/icons/SqlEditorIcon'
+import SqlPane from './SqlPane'
 import SqlTable from './SqlTable'
+import TableIcon from '../../reusable/icons/TableIcon'
 
 class HomePage extends Component {
   constructor(props) {
@@ -20,30 +23,40 @@ class HomePage extends Component {
     this.state = {
       columns: [],
       rows: [],
-      sql: null,
-      sqlMode: false,
+      sqlError: null,
+      sqlMode: true,
     }
 
+    this.fetchSelectedTableData = this.fetchSelectedTableData.bind(this)
     this.handleDeleteRows = this.handleDeleteRows.bind(this)
-    this.handleSqlKeydown = this.handleSqlKeydown.bind(this)
+    this.runSqlQuery = this.runSqlQuery.bind(this)
   }
 
   async componentDidUpdate(prevProps) {
     const { selectedTable } = this.props
 
+    // Refresh the data if we're looking at a new table.
     if (selectedTable !== prevProps.selectedTable) {
-      const getTableColumnsPromise = getTableColumns(selectedTable)
-      const getTableRowsPromise = getTableRows(selectedTable)
-
-      const [columns, rows] = await Promise.all([
-        getTableColumnsPromise,
-        getTableRowsPromise,
-      ])
-      this.setState({
-        columns,
-        rows: _.reverse(rows),
-      })
+      this.fetchSelectedTableData()
     }
+  }
+
+  /**
+   * Fetches table data for the currently selected table.
+   */
+  async fetchSelectedTableData() {
+    const { selectedTable } = this.props
+    const getTableColumnsPromise = getTableColumns(selectedTable)
+    const getTableRowsPromise = getTableRows(selectedTable)
+
+    const [columns, rows] = await Promise.all([
+      getTableColumnsPromise,
+      getTableRowsPromise,
+    ])
+    this.setState({
+      columns,
+      rows: _.reverse(rows),
+    })
   }
 
   /**
@@ -63,56 +76,89 @@ class HomePage extends Component {
   }
 
   /**
-   * Handles a keydown inside the SQL textarea.
+   * Runs the provided SQL query and stores the results.
    *
-   * @param {SyntheticEvent} event
+   * @param {String} sql
    */
-  async handleSqlKeydown(event) {
-    if (event.keyCode === KEYCODES.ENTER && event.metaKey) {
-      const queryResults = await query(this.state.sql)
+  async runSqlQuery(sql) {
+    try {
+      const queryResults = await query(sql)
 
       this.setState({
         columns: _.keys(queryResults[0]),
         rows: queryResults,
-        sqlSubmitted: true,
+      })
+    } catch (err) {
+      error('Error running SQL query:', err)
+      this.setState({
+        sqlError: err.message,
       })
     }
   }
 
+  /**
+   * Toggles if SQL mode is active or not.
+   *
+   * @param {Boolean} sqlMode
+   */
+  toggleSqlMode(sqlMode) {
+    if (sqlMode === this.state.sqlMode) {
+      return
+    }
+
+    this.fetchSelectedTableData()
+    this.setState({
+      columns: [],
+      rows: [],
+      sqlError: null,
+      sqlMode,
+    })
+  }
+
   render() {
     const { selectedTable } = this.props
-    const { columns, rows, sql, sqlMode, sqlSubmitted } = this.state
+    const { columns, rows, sqlError, sqlMode } = this.state
 
     return (
       <div className="page home-page">
-        <div>
+        <div className="home-page-header">
+          <h1 className="selected-table-name">{selectedTable}</h1>
+          <div className="mode-changer">
+            <div
+              className={cn('mode', {
+                'mode-active': !sqlMode,
+              })}
+            >
+              <TableIcon onClick={() => this.toggleSqlMode(false)} />
+            </div>
+            <div
+              className={cn('mode', {
+                'mode-active': sqlMode,
+              })}
+            >
+              <SqlEditorIcon onClick={() => this.toggleSqlMode(true)} />
+            </div>
+          </div>
+        </div>
+
+        <div className="home-page-content">
           {sqlMode && (
-            <a onClick={() => this.setState({ sqlMode: false })}>table view</a>
+            <SqlPane
+              columns={columns}
+              onRunQuery={this.runSqlQuery}
+              rows={rows}
+              sqlError={sqlError}
+            />
           )}
+
           {!sqlMode && (
-            <Fragment>
-              <h1 className="selected-table-name">{selectedTable}</h1>
-              <a onClick={() => this.setState({ sqlMode: true })}>SQL</a>
-            </Fragment>
+            <SqlTable
+              columns={columns}
+              handleDelete={this.handleDeleteRows}
+              rows={rows}
+            />
           )}
         </div>
-        {sqlMode && (
-          <div onKeyDown={this.handleSqlKeydown}>
-            <Textarea
-              handleChange={sql => this.setState({ sql })}
-              value={sql}
-            />
-
-            {sqlSubmitted && <SqlTable columns={columns} rows={rows} />}
-          </div>
-        )}
-        {!sqlMode && (
-          <SqlTable
-            columns={columns}
-            handleDelete={this.handleDeleteRows}
-            rows={rows}
-          />
-        )}
       </div>
     )
   }

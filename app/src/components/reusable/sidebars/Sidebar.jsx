@@ -13,9 +13,12 @@ class Sidebar extends Component {
   }
 
   async componentDidMount() {
+    const tableNames = await getTableNames()
     this.setState({
-      tableNames: await getTableNames(),
+      tableNames,
     })
+
+    this.props.onSelectTable(tableNames[0])
   }
 
   render() {
