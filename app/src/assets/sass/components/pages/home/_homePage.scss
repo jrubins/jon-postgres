@@ -1,0 +1,39 @@
+.home-page {
+  h1 {
+    font-size: 24px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+
+    tbody {
+      tr:nth-child(odd) {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      tr.table-row-selected {
+        background-color: rgba(0, 0, 0, 0.30);
+      }
+    }
+
+    th {
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    th,
+    td {
+      text-align: center;
+      white-space: nowrap;
+      max-width: 200px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding: 5px 10px;
+    }
+  }
+}
+
+.table-data {
+  margin-top: 15px;
+}

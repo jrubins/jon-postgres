@@ -1,0 +1,22 @@
+@import 'sidebarLink';
+
+.sidebar {
+  flex-shrink: 0;
+
+  width: 200px;
+  height: 100vh;
+  padding: 15px;
+  background-color: $white;
+
+  overflow: scroll;
+
+  a {
+    display: block;
+
+    padding: 1px 3px;
+  }
+}
+
+.sidebar-link-active {
+  background-color: #ddd;
+}

@@ -1,0 +1,120 @@
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+
+  background-color: $wild-sand;
+  color: $mine-shaft;
+  font-family: $font-face;
+  font-size: 14px;
+  line-height: $base-line-height;
+
+  -webkit-font-smoothing: antialiased; // sass-lint:disable-line no-vendor-prefixes
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+h4 {
+  color: $shuttle-gray;
+
+  font-size: 16px;
+  font-weight: bold;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  font-size: 12px;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+a,
+a:hover,
+a:focus {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+// Overriding normalize's setting.
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: $font-face;
+}
+
+button {
+  cursor: pointer;
+}
+
+// This removes the shadowing that iOS Safari puts on inputs.
+input[type='text'], // sass-lint:disable-line no-qualifying-elements
+input[type='password'] { // sass-lint:disable-line no-qualifying-elements
+  appearance: none;
+}
+
+input[type='password'] { // sass-lint:disable-line no-qualifying-elements
+  font-family: sans-serif;
+}
+
+.hidden-xs {
+  @media (max-width: $screen-xs-max) {
+    display: none;
+  }
+}
+
+.visible-xs {
+  display: none;
+
+  @media (max-width: $screen-xs-max) {
+    display: inline;
+  }
+}
