@@ -33,7 +33,7 @@
     "*.{scss}": ["sass-lint -v -q"]
   },
   "dependencies": {
-    "@jrubins/react-components": "0.0.3",
+    "@jrubins/react-components": "0.0.4",
     "classnames": "2.2.5",
     "lodash": "4.17.5",
     "moment": "2.21.0",

@@ -40,7 +40,11 @@ class SqlPane extends Component {
     return (
       <div className="sql-pane">
         <div className="sql-pane-editor" onKeyDown={this.handleSqlKeydown}>
-          <Textarea handleChange={sql => this.setState({ sql })} value={sql} />
+          <Textarea
+            handleChange={sql => this.setState({ sql })}
+            placeholder="Type SQL here..."
+            value={sql}
+          />
 
           {sqlError && <div className="sql-pane-error">{sqlError}</div>}
         </div>
