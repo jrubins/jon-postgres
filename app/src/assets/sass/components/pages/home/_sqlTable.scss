@@ -10,7 +10,8 @@
 
     // Need extra specificity here due to the above psuedo selector.
     tr.table-row-selected { // sass-lint:disable-line no-qualifying-elements
-      background-color: $faded-black-less;
+      background-color: $faded-blue;
+      //border: 1px solid $blue;
     }
   }
 

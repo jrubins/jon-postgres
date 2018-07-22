@@ -59,12 +59,36 @@ class SqlTable extends Component {
         return
       }
       this.additionalIndexes = this.additionalIndexes - 1
+    } else if (event.keyCode === KEYCODES.DOWN_ARROW) {
+      // If multiple rows are selected, select the next row after all the selected ones.
+      this.initialSelectedRow =
+        this.additionalIndexes > 0
+          ? this.initialSelectedRow + this.additionalIndexes + 1
+          : this.initialSelectedRow + 1
+      this.additionalIndexes = 0
+
+      // Don't go beyond the number of rows being displayed.
+      this.initialSelectedRow = Math.min(
+        this.initialSelectedRow,
+        rows.length - 1
+      )
+    } else if (event.keyCode === KEYCODES.UP_ARROW) {
+      // If multiple rows are selected, select the row before all the selected ones.
+      this.initialSelectedRow =
+        this.additionalIndexes < 0
+          ? this.initialSelectedRow + this.additionalIndexes - 1
+          : this.initialSelectedRow - 1
+      this.additionalIndexes = 0
+
+      // Don't go beyond the first row.
+      this.initialSelectedRow = Math.max(this.initialSelectedRow, 0)
     } else if (
       event.keyCode === KEYCODES.DELETE &&
       !_.isEmpty(selectedRows) &&
       _.isFunction(handleDelete)
     ) {
       handleDelete(selectedRows)
+      return
     } else {
       return
     }

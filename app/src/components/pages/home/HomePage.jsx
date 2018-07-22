@@ -24,7 +24,7 @@ class HomePage extends Component {
       columns: [],
       rows: [],
       sqlError: null,
-      sqlMode: true,
+      sqlMode: false,
     }
 
     this.fetchSelectedTableData = this.fetchSelectedTableData.bind(this)
